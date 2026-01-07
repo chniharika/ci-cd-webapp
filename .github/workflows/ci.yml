@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-test-scan:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,8 +16,25 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build backend image
+      - name: Build backend Docker image
         run: docker build -t backend-app ./backend
 
-      - name: Build frontend image
+      - name: Run backend tests
+        run: docker run backend-app pytest
+
+      - name: Build frontend Docker image
         run: docker build -t frontend-app ./frontend
+
+      - name: Trivy scan backend image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: backend-app
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+      - name: Trivy scan frontend image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: frontend-app
+          severity: HIGH,CRITICAL
+          exit-code: 0
