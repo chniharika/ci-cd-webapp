@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  backend:
+    image: backend-app
+    container_name: backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=sqlite:///test.db
+
+  frontend:
+    image: frontend-app
+    container_name: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
