@@ -1,21 +1,19 @@
 services:
   db:
     image: postgres:15
-    container_name: postgres-local
+    container_name: postgres-staging
     environment:
       POSTGRES_DB: appdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - pgdata-staging:/var/lib/postgresql/data
     networks:
       - app-network
 
   backend:
-    image: backend-app
-    container_name: backend-local
+    image: chniha03/backend-app:latest
+    container_name: backend-staging
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/appdb
     ports:
@@ -26,8 +24,8 @@ services:
       - app-network
 
   frontend:
-    image: frontend-app
-    container_name: frontend-local
+    image: chniha03/frontend-app:latest
+    container_name: frontend-staging
     ports:
       - "8080:80"
     depends_on:
@@ -36,7 +34,7 @@ services:
       - app-network
 
 volumes:
-  pgdata:
+  pgdata-staging:
 
 networks:
   app-network:

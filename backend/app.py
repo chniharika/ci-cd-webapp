@@ -1,33 +1,37 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 import os
 
 app = Flask(__name__)
 
-# Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+# ✅ Enable CORS for frontend
+CORS(app, origins=["http://localhost:8080"])
+
+# Database configuration (PostgreSQL)
+DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "sqlite:///test.db"
+    "postgresql://postgres:postgres@db:5432/appdb"
 )
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# Database model
+# User model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
 
-# Health check API
 @app.route("/health")
 def health():
     return jsonify({"status": "ok"})
 
-# Sample API
 @app.route("/users")
 def users():
     users = User.query.all()
-    return jsonify([user.name for user in users])
+    return jsonify([u.name for u in users])
 
 if __name__ == "__main__":
     with app.app_context():
